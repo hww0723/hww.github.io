@@ -96,8 +96,25 @@
                 </p>
             </div>
             
-            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-10 mb-10">
-                <div class="flex flex-col items-center">
-                    <!-- 木鱼图片 -->
-                    <div class="cursor-pointer mb-8 relative" id="woodenFish">
-                        <img
+            <!-- 计数按钮区域 -->
+            <section id="counter" class="bg-white rounded-2xl shadow-md p-8 md:p-10 text-center">
+                <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-gray-900 mb-8">
+                    木鱼
+                </h2>
+                
+                <div class="max-w-md mx-auto">
+                    <!-- 可点击的按钮图片 -->
+                    <div class="cursor-pointer mx-auto w-40 h-40 md:w-56 md:h-56 mb-8 rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all" id="countButton">
+                        <img src="https://ts4.tc.mm.bing.net/th/id/OIP-C.5tLEIQkgfcQPUtVYz82y8QHaE7?rs=1&pid=ImgDetMain&o=7&rm=3" alt="木鱼" class="w-full h-full object-cover transition-transform hover:scale-105">
+                    </div>
+                    
+                    <!-- 计数显示区域 -->
+                    <div class="bg-gray-50 rounded-xl p-6 shadow-inner">
+                        <p class="text-gray-600 mb-2">已积德:</p>
+                        <div class="text-4xl md:text-5xl font-bold text-primary" id="countDisplay">0</div>
+                        <button id="resetButton" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-all">
+                            <i class="fa fa-refresh mr-1"></i> 重新做人
+                        </button>
+                    </div>
+                </div>
+            </section>
