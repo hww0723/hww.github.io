@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>胡文皖 - 带计数功能</title>
+    <title>胡文皖的博客</title>
     <!-- 引入外部资源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -14,13 +14,14 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563eb',
-                        secondary: '#0d9488',
-                        accent: '#7c3aed',
-                        neutral: '#f8fafc',
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
                     },
                     fontFamily: {
-                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                 }
             }
@@ -30,233 +31,488 @@
     <!-- 自定义样式 -->
     <style type="text/tailwindcss">
         @layer utilities {
-            .text-balance {
-                text-wrap: balance;
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             .card-hover {
-                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+                @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
             }
-            .pulse-effect {
-                animation: pulse 0.3s ease-in-out;
+            .gradient-overlay {
+                background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
             }
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(0.95); }
-                100% { transform: scale(1); }
+            .bg-blur {
+                backdrop-filter: blur(8px);
             }
         }
     </style>
 </head>
-<body class="bg-neutral font-inter text-gray-800 antialiased">
-    <!-- 页面加载动画容器 -->
+<body class="bg-light font-sans text-gray-800 antialiased">
+    <!-- 页面加载动画 -->
     <div id="loader" class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
-        <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-primary font-medium">加载中...</p>
+        </div>
     </div>
 
     <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-sm z-40 transition-all duration-300" id="navbar">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <i class="fa fa-cube text-primary text-xl mr-2"></i>
-                    <span class="font-semibold text-lg">胡文皖</span>
+                    <a href="#" class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                            <i class="fa fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl text-white text-shadow">胡文皖</span>
+                    </a>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#home" class="text-gray-600 hover:text-primary transition-colors">首页</a>
-                    <a href="#section1" class="text-gray-600 hover:text-primary transition-colors">内容</a>
-                    <a href="#counter" class="text-gray-600 hover:text-primary transition-colors">计数器</a>
-                    <a href="#section2" class="text-gray-600 hover:text-primary transition-colors">相关</a>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-white hover:text-primary/90 transition-colors font-medium">首页</a>
+                    <a href="#features" class="text-white hover:text-primary/90 transition-colors font-medium">功能</a>
+                    <a href="#blog" class="text-white hover:text-primary/90 transition-colors font-medium">博客</a>
+                    <a href="#about" class="text-white hover:text-primary/90 transition-colors font-medium">关于</a>
+                    <a href="wooden-fish.html" class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-full transition-all shadow-lg hover:shadow-primary/30">
+                        开始积德
+                    </a>
                 </div>
+                
+                <!-- 移动端菜单按钮 -->
                 <div class="md:hidden">
-                    <button id="menuBtn" class="text-gray-600 hover:text-primary">
-                        <i class="fa fa-bars text-xl"></i>
+                    <button id="menuBtn" class="text-white hover:text-primary focus:outline-none">
+                        <i class="fa fa-bars text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
+        
         <!-- 移动端菜单 -->
-        <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
-            <div class="px-4 py-3 space-y-3">
-                <a href="#home" class="block text-gray-600 hover:text-primary transition-colors">首页</a>
-                <a href="#section1" class="block text-gray-600 hover:text-primary transition-colors">内容</a>
-                <a href="#counter" class="block text-gray-600 hover:text-primary transition-colors">计数器</a>
-                <a href="#section2" class="block text-gray-600 hover:text-primary transition-colors">相关</a>
+        <div id="mobileMenu" class="md:hidden hidden bg-white/95 bg-blur mt-4 rounded-b-xl shadow-2xl mx-4 overflow-hidden">
+            <div class="flex flex-col space-y-1">
+                <a href="#home" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">首页</a>
+                <a href="#features" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">功能</a>
+                <a href="#blog" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">博客</a>
+                <a href="#about" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">关于</a>
+                <a href="wooden-fish.html" class="mx-4 my-3 bg-primary text-white text-center px-5 py-3 rounded-full transition-all">
+                    开始积德
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- 页面容器 -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        
-        <!-- 头部区域 -->
-        <header id="home" class="mb-16 md:mb-24 text-center">
-            <div class="inline-block p-4 bg-primary/10 rounded-full mb-8 animate-pulse">
-                <i class="fa fa-line-chart text-primary text-3xl"></i>
+    <!-- 主内容区 -->
+    <main>
+        <!-- Hero区域 -->
+        <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <!-- 背景图 -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://picsum.photos/id/1002/1920/1080" alt="博客背景" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-dark/60"></div>
             </div>
-            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-gray-900 mb-6 leading-tight">
-                胡文皖
-            </h1>
-            <p class="text-gray-600 max-w-2xl mx-auto text-lg md:text-xl text-balance">
-                这是我做的一个简单的计数器，当然，你也可以把它当做一个木鱼。
-            </p>
-            <div class="mt-10">
-                <a href="#section1" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg shadow-md hover:bg-primary/90 transition-all">
-                    了解详情（其实啥也没有）
-                    <i class="fa fa-arrow-down ml-2"></i>
-                </a>
-            </div>
-        </header>
-        
-        <!-- 主要内容区域 -->
-        <main class="space-y-16 md:space-y-24">
-            <!-- 第一部分内容 -->
-            <section id="section1" class="bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="p-8 md:p-10">
-                    <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center mr-4">
-                            <i class="fa fa-lightbulb-o text-secondary text-xl"></i>
-                        </div>
-                        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-gray-900">
-                            这是一个小标题
-                        </h2>
-                    </div>
-                    <div class="prose prose-lg text-gray-700 max-w-none">
-                        <p>
-                            下面是小标题内容，我们可以在这里详细阐述这个部分的核心观点。良好的排版和适当的留白能够显著提升内容的可读性，让用户更容易获取信息。
-                        </p>
-                        <p class="mt-4">
-                            我们可以添加更多的段落来丰富内容，通过清晰的结构和层次，帮助用户理解复杂的信息。适当使用项目符号或编号列表也能提高内容的清晰度。
-                        </p>
-                    </div>
-                    
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all group">
-                            了解更多
-                            <i class="fa fa-arrow-right ml-2 text-sm transform group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                    </div>
-                </div>
-            </section>
             
-            <!-- 计数按钮区域 -->
-            <section id="counter" class="bg-white rounded-2xl shadow-md p-8 md:p-10 text-center">
-                <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-gray-900 mb-8">
-                    木鱼
-                </h2>
+            <!-- 内容 -->
+            <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+                <h1 class="text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white leading-tight mb-6 animate-fade-in">
+                    探索、创造、分享
+                </h1>
+                <p class="text-[clamp(1rem,3vw,1.25rem)] text-gray-100 mb-10 max-w-2xl mx-auto">
+                    欢迎来到我的个人空间，这里有有趣的互动小工具、我的思考和分享，希望能给你带来一些乐趣和启发。
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="wooden-fish.html" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center">
+                        <i class="fa fa-gavel mr-2"></i> 敲击木鱼
+                    </a>
+                    <a href="#features" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-4 rounded-full text-lg font-medium transition-all flex items-center justify-center">
+                        探索更多 <i class="fa fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
                 
-                <div class="max-w-md mx-auto">
-                    <!-- 可点击的按钮图片 -->
-                    <div class="cursor-pointer mx-auto w-40 h-40 md:w-56 md:h-56 mb-8 rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all" id="countButton">
-                        <img src="https://ts4.tc.mm.bing.net/th/id/OIP-C.5tLEIQkgfcQPUtVYz82y8QHaE7?rs=1&pid=ImgDetMain&o=7&rm=3" alt="木鱼" class="w-full h-full object-cover transition-transform hover:scale-105">
+                <!-- 滚动提示 -->
+                <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <a href="#features" class="text-white/70 hover:text-white transition-colors">
+                        <i class="fa fa-chevron-down text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 功能区 -->
+        <section id="features" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-4">有趣的小工具</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                        我制作了一些简单有趣的互动工具，希望能给你的生活带来一点乐趣
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 木鱼工具 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://ts4.tc.mm.bing.net/th/id/OIP-C.5tLEIQkgfcQPUtVYz82y8QHaE7?rs=1&pid=ImgDetMain&o=7&rm=3" alt="电子木鱼" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                                <i class="fa fa-gavel text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">电子木鱼</h3>
+                            <p class="text-gray-600 mb-4">
+                                敲击木鱼，积累功德，放松心情，缓解压力的小工具。
+                            </p>
+                            <a href="wooden-fish.html" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all">
+                                开始使用 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
                     </div>
                     
-                    <!-- 计数显示区域 -->
-                    <div class="bg-gray-50 rounded-xl p-6 shadow-inner">
-                        <p class="text-gray-600 mb-2">已积德:</p>
-                        <div class="text-4xl md:text-5xl font-bold text-primary" id="countDisplay">0</div>
-                        <button id="resetButton" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-all">
-                            <i class="fa fa-refresh mr-1"></i> 重新做人
+                    <!-- 猜数字游戏 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                        <div class="h-48 overflow-hidden bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
+                            <i class="fa fa-gamepad text-7xl text-accent/70"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                                <i class="fa fa-puzzle-piece text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">猜数字游戏</h3>
+                            <p class="text-gray-600 mb-4">
+                                系统随机生成一个数字，看看你能在多少次内猜到正确答案。
+                            </p>
+                            <a href="number-guess.html" class="inline-flex items-center text-accent font-medium hover:text-accent/80 transition-all">
+                                开始游戏 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 待办清单 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                        <div class="h-48 overflow-hidden bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center">
+                            <i class="fa fa-list-check text-7xl text-secondary/70"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
+                                <i class="fa fa-check-square-o text-secondary text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">待办清单</h3>
+                            <p class="text-gray-600 mb-4">
+                                简单实用的待办事项管理工具，帮助你记录和完成每日任务。
+                            </p>
+                            <a href="todo-list.html" class="inline-flex items-center text-secondary font-medium hover:text-secondary/80 transition-all">
+                                开始使用 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 随机语录 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                        <div class="h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                            <i class="fa fa-quote-right text-7xl text-primary/70"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                                <i class="fa fa-comment text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">随机语录</h3>
+                            <p class="text-gray-600 mb-4">
+                                每次刷新都会显示一句随机名言警句，给你带来一些思考和启发。
+                            </p>
+                            <a href="quotes.html" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all">
+                                获取语录 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 计算器 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                        <div class="h-48 overflow-hidden bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center">
+                            <i class="fa fa-calculator text-7xl text-accent/70"></i>
+                        </div>
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                                <i class="fa fa-calculator text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">简易计算器</h3>
+                            <p class="text-gray-600 mb-4">
+                                简洁实用的在线计算器，支持基本的数学运算功能。
+                            </p>
+                            <a href="calculator.html" class="inline-flex items-center text-accent font-medium hover:text-accent/80 transition-all">
+                                开始计算 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 更多工具 -->
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                            <i class="fa fa-plus text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-500">更多工具</h3>
+                        <p class="text-gray-400 text-center mb-4">
+                            更多有趣的小工具正在开发中，敬请期待...
+                        </p>
+                        <button disabled class="inline-flex items-center text-gray-400 font-medium bg-gray-100 px-4 py-2 rounded-lg cursor-not-allowed">
+                            即将上线 <i class="fa fa-clock-o ml-2"></i>
                         </button>
                     </div>
                 </div>
-            </section>
-            
-            <!-- 第二部分内容 -->
-            <section id="section2" class="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-8 md:p-10">
-                <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-gray-900 mb-8">
-                    相关主题内容
-                </h2>
+            </div>
+        </section>
+        
+        <!-- 博客区域 -->
+        <section id="blog" class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-4">最新博客</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                        记录生活中的思考和感悟，分享我的学习心得和经验
+                    </p>
+                </div>
                 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
-                        <div class="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fa fa-check-circle text-primary text-xl"></i>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 博客文章1 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/id/1/600/400" alt="编程学习" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                         </div>
-                        <h3 class="font-semibold text-lg mb-3">
-                            数据驱动决策
-                        </h3>
-                        <p class="text-gray-600">
-                            如何利用数据分析来做出更明智的决策，提升业务效率和竞争力。通过数据洞察市场趋势，优化业务流程。
-                        </p>
-                    </div>
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <span class="flex items-center"><i class="fa fa-calendar-o mr-1"></i> 2023-06-15</span>
+                                <span class="mx-2">•</span>
+                                <span class="flex items-center"><i class="fa fa-folder-o mr-1"></i> 编程</span>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 hover:text-primary transition-colors">
+                                <a href="#">学习JavaScript的一些心得</a>
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                JavaScript是一门非常灵活的语言，学习过程中遇到了很多挑战，也收获了很多。本文分享我学习JavaScript的一些方法和心得...
+                            </p>
+                            <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all">
+                                阅读全文 <i class="fa fa-long-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </article>
                     
-                    <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
-                        <div class="h-12 w-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fa fa-bar-chart text-accent text-xl"></i>
+                    <!-- 博客文章2 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/id/2/600/400" alt="生活感悟" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                         </div>
-                        <h3 class="font-semibold text-lg mb-3">
-                            数字趋势分析
-                        </h3>
-                        <p class="text-gray-600">
-                            探索当前数字领域的发展趋势，把握未来技术变革的方向和机遇。了解行业动态，提前布局未来发展。
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <span class="flex items-center"><i class="fa fa-calendar-o mr-1"></i> 2023-05-28</span>
+                                <span class="mx-2">•</span>
+                                <span class="flex items-center"><i class="fa fa-folder-o mr-1"></i> 生活</span>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 hover:text-primary transition-colors">
+                                <a href="#">如何保持专注和提高效率</a>
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                在这个信息爆炸的时代，保持专注变得越来越难。分享一些我个人实践过的有效方法，帮助你提高工作和学习效率...
+                            </p>
+                            <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all">
+                                阅读全文 <i class="fa fa-long-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </article>
+                    
+                    <!-- 博客文章3 -->
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/id/3/600/400" alt="项目分享" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <span class="flex items-center"><i class="fa fa-calendar-o mr-1"></i> 2023-04-10</span>
+                                <span class="mx-2">•</span>
+                                <span class="flex items-center"><i class="fa fa-folder-o mr-1"></i> 项目</span>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 hover:text-primary transition-colors">
+                                <a href="#">电子木鱼项目的开发过程</a>
+                            </h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                分享我开发电子木鱼这个小工具的想法来源、技术实现和遇到的挑战。从创意到成品，每一步都有不少收获...
+                            </p>
+                            <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-all">
+                                阅读全文 <i class="fa fa-long-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <a href="#" class="inline-flex items-center px-6 py-3 bg-white text-primary border border-primary rounded-full shadow-sm hover:bg-primary/5 transition-all font-medium">
+                        查看所有文章 <i class="fa fa-chevron-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 关于我 -->
+        <section id="about" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="relative">
+                            <div class="absolute -top-4 -left-4 w-64 h-64 bg-primary/10 rounded-full z-0"></div>
+                            <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-accent/10 rounded-full z-0"></div>
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/44e47c5b86d94a5a84dc80af133802f3.png~tplv-a9rns2rl98-24:720:720.png?rk3s=1fb89129&x-expires=1757170473&x-signature=EnJIRym2ACfZ%2BoDAI7zKgm0jv30%3D" alt="胡文皖" class="w-full max-w-sm mx-auto rounded-2xl shadow-xl relative z-10">
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-6">关于我</h2>
+                        <p class="text-gray-600 mb-4 text-lg">
+                            你好，我是胡文皖，一名热爱编程和创造的开发者。我喜欢制作一些有趣、实用的小工具，分享我的学习经验和生活感悟。
                         </p>
+                        <p class="text-gray-600 mb-6 text-lg">
+                            这个网站是我的个人空间，包含了我开发的一些小工具、游戏和博客文章。希望你能在这里找到一些有用或有趣的东西。
+                        </p>
+                        
+                        <div class="mb-8">
+                            <h3 class="font-semibold text-lg mb-3">我的技能</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">HTML5</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">CSS3</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">JavaScript</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">React</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">Tailwind CSS</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">Node.js</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-all">
+                                <i class="fa fa-github"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-all">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-all">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-all">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
         
-        <!-- 页脚 -->
-        <footer class="mt-20 pt-10 border-t border-gray-200">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center mb-4 md:mb-0">
-                    <i class="fa fa-cube text-primary text-xl mr-2"></i>
-                    <span class="font-semibold">胡文皖</span>
+        <!-- 订阅区域 -->
+        <section class="py-16 bg-primary/5">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">订阅我的更新</h2>
+                <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
+                    订阅我的邮件列表，获取最新的工具更新、博客文章和其他有趣的内容
+                </p>
+                <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                    <input type="email" placeholder="输入你的邮箱地址" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <button type="submit" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
+                        订阅
+                    </button>
+                </form>
+                <p class="text-gray-500 text-sm mt-4">
+                    我们尊重你的隐私，不会向第三方分享你的信息
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                            <i class="fa fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl">胡文皖</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        探索、创造、分享，记录生活中的点点滴滴
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-github text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-envelope text-xl"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="flex space-x-6 text-gray-500">
-                    <a href="#" class="hover:text-primary transition-colors"><i class="fa fa-twitter"></i></a>
-                    <a href="#" class="hover:text-primary transition-colors"><i class="fa fa-linkedin"></i></a>
-                    <a href="#" class="hover:text-primary transition-colors"><i class="fa fa-github"></i></a>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">功能</a></li>
+                        <li><a href="#blog" class="text-gray-400 hover:text-white transition-colors">博客</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">关于</a></li>
+                        <li><a href="wooden-fish.html" class="text-gray-400 hover:text-white transition-colors">电子木鱼</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">工具</h3>
+                    <ul class="space-y-2">
+                        <li><a href="wooden-fish.html" class="text-gray-400 hover:text-white transition-colors">电子木鱼</a></li>
+                        <li><a href="number-guess.html" class="text-gray-400 hover:text-white transition-colors">猜数字游戏</a></li>
+                        <li><a href="todo-list.html" class="text-gray-400 hover:text-white transition-colors">待办清单</a></li>
+                        <li><a href="quotes.html" class="text-gray-400 hover:text-white transition-colors">随机语录</a></li>
+                        <li><a href="calculator.html" class="text-gray-400 hover:text-white transition-colors">简易计算器</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">联系我</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa fa-envelope-o mr-2"></i>
+                            <a href="mailto:example@example.com" class="hover:text-white transition-colors">example@example.com</a>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa fa-map-marker mr-2"></i>
+                            <span>中国，北京</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="mt-6 text-center text-gray-500 text-sm">
-                <p>© 2025 胡文皖. 保留所有权利.</p>
+            
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                        &copy; 2023 胡文皖. 保留所有权利.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm">隐私政策</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm">使用条款</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm">Cookie政策</a>
+                    </div>
+                </div>
             </div>
-        </footer>
-    </div>
-    
-    <!-- 音效元素 -->
-    <audio id="woodenFishSound" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wood-hit-1530.mp3" type="audio/mpeg">
-    </audio>
-    
-    <!-- 交互脚本 -->
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center opacity-0 invisible transition-all z-30 hover:bg-primary/90">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript -->
     <script>
-        // 获取音效元素
-        const woodenFishSound = document.getElementById('woodenFishSound');
-        
-        // 计数功能实现
-        let count = 0;
-        const countDisplay = document.getElementById('countDisplay');
-        const countButton = document.getElementById('countButton');
-        const resetButton = document.getElementById('resetButton');
-        
-        // 点击图片计数并播放音效
-        countButton.addEventListener('click', () => {
-            count++;
-            countDisplay.textContent = count;
-            // 播放音效
-            woodenFishSound.currentTime = 0; // 重置音效到开始位置
-            woodenFishSound.play().catch(e => {
-                console.log("播放音效需要用户交互，这是浏览器的安全限制。", e);
-            });
-            // 添加点击动画效果
-            countButton.classList.add('pulse-effect');
-            setTimeout(() => {
-                countButton.classList.remove('pulse-effect');
-            }, 300);
-        });
-        
-        // 重置计数
-        resetButton.addEventListener('click', () => {
-            count = 0;
-            countDisplay.textContent = count;
-            // 添加重置动画效果
-            countDisplay.classList.add('pulse-effect');
-            setTimeout(() => {
-                countDisplay.classList.remove('pulse-effect');
-            }, 300);
-        });
-        
         // 页面加载完成后隐藏加载动画
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -265,7 +521,29 @@
                 setTimeout(() => {
                     loader.style.display = 'none';
                 }, 500);
-            }, 800);
+            }, 600);
+        });
+        
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('bg-dark/90', 'bg-blur', 'shadow-lg', 'py-2');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.remove('bg-dark/90', 'bg-blur', 'shadow-lg', 'py-2');
+                navbar.classList.add('py-4');
+            }
+            
+            // 回到顶部按钮显示/隐藏
+            const backToTopBtn = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+            }
         });
         
         // 移动端菜单切换
@@ -281,18 +559,6 @@
             } else {
                 icon.classList.remove('fa-bars');
                 icon.classList.add('fa-times');
-            }
-        });
-        
-        // 导航栏滚动效果
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('shadow');
-                navbar.classList.remove('shadow-sm');
-            } else {
-                navbar.classList.remove('shadow');
-                navbar.classList.add('shadow-sm');
             }
         });
         
@@ -320,7 +586,25 @@
                 }
             });
         });
+        
+        // 回到顶部功能
+        document.getElementById('backToTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
     </script>
 </body>
 </html>
-
+    <!-- 嵌入wooden-fish.html -->
+    <div class="wooden-fish-container">
+        <iframe src="wooden-fish.html" 
+                width="100%" 
+                height="600px" 
+                frameborder="0"
+                title="木鱼页面">
+        </iframe>
+    </div>
+</body>
+</html>
