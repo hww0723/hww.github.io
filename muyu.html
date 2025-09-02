@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子木鱼 - 胡文皖的小站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        dark: '#1e293b',
+                    },
+                    keyframes: {
+                        tap: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(0.95)' },
+                            '100%': { transform: 'scale(1)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        countUp: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.2)', color: '#3b82f6' },
+                            '100%': { transform: 'scale(1)' }
+                        }
+                    },
+                    animation: {
+                        tap: 'tap 0.3s ease-in-out',
+                        float: 'float 3s ease-in-out infinite',
+                        countUp: 'countUp 0.5s ease-in-out'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+            .wooden-shadow {
+                box-shadow: 0 10px 30px rgba(101, 67, 33, 0.4);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-amber-50 to-orange-50 font-sans text-gray-800 antialiased">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-white/80 bg-blur shadow-md py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                            <i class="fa fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl">胡文皖的小站</span>
+                    </a>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-primary transition-colors font-medium">主页</a>
+                    <a href="wooden-fish.html" class="text-primary font-medium">木鱼</a>
+                    <a href="calculator.html" class="text-gray-700 hover:text-primary transition-colors font-medium">计算器</a>
+                    <a href="tetris.html" class="text-gray-700 hover:text-primary transition-colors font-medium">俄罗斯方块</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-700 hover:text-primary focus:outline-none transition-all">
+                        <i class="fa fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white shadow-2xl mx-4 overflow-hidden transition-all duration-300 ease-in-out">
+            <div class="flex flex-col space-y-1">
+                <a href="index.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">主页</a>
+                <a href="wooden-fish.html" class="px-6 py-3 bg-primary/10 text-primary font-medium">电子木鱼</a>
+                <a href="number-guess.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">猜数字</a>
+                <a href="todo-list.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">待办清单</a>
+                <a href="calculator.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">计算器</a>
+                <a href="tetris.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">俄罗斯方块</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="pt-24 pb-20">
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-amber-800 mb-4">电子木鱼</h1>
+                <p class="text-gray-600 text-lg">点击木鱼，积累功德，放松心情</p>
+            </div>
+            
+            <div class="flex flex-col items-center justify-center">
+                <!-- 功德计数 -->
+                <div class="mb-10 bg-white rounded-2xl shadow-lg px-8 py-4 inline-block">
+                    <h2 class="text-2xl font-semibold text-gray-700">累计功德：</h2>
+                    <span id="meritCount" class="text-4xl font-bold text-primary ml-2">0</span>
+                </div>
+                
+                <!-- 木鱼主体（可点击） -->
+                <div id="woodenFish" class="w-64 h-80 md:w-80 md:h-96 bg-gradient-to-b from-amber-800 to-amber-900 rounded-t-full rounded-b-3xl wooden-shadow cursor-pointer transition-all duration-300 animate-float flex flex-col items-center justify-center relative overflow-hidden">
+                    <!-- 木鱼纹理 -->
+                    <div class="absolute inset-0 opacity-20">
+                        <div class="w-full h-full bg-[url('https://picsum.photos/id/1016/800/900')] bg-cover mix-blend-overlay"></div>
+                    </div>
+                    <!-- 木鱼眼睛 -->
+                    <div class="flex space-x-16 mb-12">
+                        <div class="w-4 h-4 bg-white rounded-full border-2 border-amber-700"></div>
+                        <div class="w-4 h-4 bg-white rounded-full border-2 border-amber-700"></div>
+                    </div>
+                    <!-- 木鱼嘴 -->
+                    <div class="w-24 h-8 border-t-4 border-amber-700 rounded-t-full"></div>
+                    <!-- 敲击提示 -->
+                    <div class="absolute bottom-8 text-amber-200 text-sm">
+                        <i class="fa fa-hand-pointer-o mr-1"></i> 点击木鱼
+                    </div>
+                </div>
+                
+                <!-- 功能按钮 -->
+                <div class="mt-12 flex flex-wrap gap-4 justify-center">
+                    <button id="resetBtn" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full font-medium transition-all shadow-md hover:shadow-lg flex items-center">
+                        <i class="fa fa-refresh mr-2"></i> 重置功德
+                    </button>
+                    <button id="autoTapBtn" class="bg-accent hover:bg-accent/90 text-white px-6 py-3 rounded-full font-medium transition-all shadow-md hover:shadow-lg flex items-center">
+                        <i class="fa fa-play mr-2"></i> 自动敲击
+                    </button>
+                </div>
+                
+                <!-- 音效提示 -->
+                <div class="mt-8 text-gray-500 text-sm flex items-center">
+                    <i class="fa fa-volume-up mr-2 text-primary"></i>
+                    <span>点击时自动播放木鱼音效</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-10 pb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="border-t border-gray-800 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                        &copy; 2025 胡文皖. 保留所有权利.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">隐私政策</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">使用条款</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 木鱼音效（隐藏） -->
+    <audio id="woodenSound" preload="auto">
+        <source src="https://freesound.org/data/previews/512/512010_10224462-lq.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+
+    <!-- JavaScript -->
+    <script>
+        // 初始化变量
+        let meritCount = 0;
+        let autoTapInterval = null;
+        let isAutoTapping = false;
+        
+        // DOM元素
+        const woodenFish = document.getElementById('woodenFish');
+        const meritCountEl = document.getElementById('meritCount');
+        const resetBtn = document.getElementById('resetBtn');
+        const autoTapBtn = document.getElementById('autoTapBtn');
+        const woodenSound = document.getElementById('woodenSound');
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        // 播放音效函数
+        function playSound() {
+            // 重置音效播放位置，确保每次点击都能播放
+            woodenSound.currentTime = 0;
+            // 尝试播放（处理浏览器自动播放限制）
+            woodenSound.play().catch(err => {
+                console.log('需要用户交互后才能播放音效:', err);
+                // 提示用户点击页面后再试
+                alert('请先点击页面任意位置，再使用木鱼功能（浏览器限制）');
+            });
+        }
+        
+        // 敲击木鱼函数
+        function tapWoodenFish() {
+            // 播放音效
+            playSound();
+            
+            // 增加功德
+            meritCount++;
+            meritCountEl.textContent = meritCount;
+            
+            // 添加敲击动画
+            woodenFish.classList.add('animate-tap');
+            meritCountEl.classList.add('animate-countUp');
+            
+            // 移除动画类
+            setTimeout(() => {
+                woodenFish.classList.remove('animate-tap');
+                meritCountEl.classList.remove('animate-countUp');
+            }, 300);
+            
+            // 创建粒子效果
+            createTapParticles();
+        }
+        
+        // 点击木鱼触发
+        woodenFish.addEventListener('click', tapWoodenFish);
+        
+        // 重置功德
+        resetBtn.addEventListener('click', () => {
+            if (confirm('确定要重置功德吗？')) {
+                meritCount = 0;
+                meritCountEl.textContent = meritCount;
+                
+                // 添加重置动画
+                meritCountEl.classList.add('animate-countUp');
+                setTimeout(() => {
+                    meritCountEl.classList.remove('animate-countUp');
+                }, 500);
+            }
+        });
+        
+        // 自动敲击
+        autoTapBtn.addEventListener('click', () => {
+            if (isAutoTapping) {
+                // 停止自动敲击
+                clearInterval(autoTapInterval);
+                autoTapBtn.innerHTML = '<i class="fa fa-play mr-2"></i> 自动敲击';
+                autoTapBtn.classList.remove('bg-red-500');
+                autoTapBtn.classList.add('bg-accent');
+            } else {
+                // 开始自动敲击（每秒2次）
+                autoTapInterval = setInterval(tapWoodenFish, 500);
+                autoTapBtn.innerHTML = '<i class="fa fa-stop mr-2"></i> 停止自动';
+                autoTapBtn.classList.remove('bg-accent');
+                autoTapBtn.classList.add('bg-red-500');
+                
+                // 首次自动敲击
+                tapWoodenFish();
+            }
+            
+            isAutoTapping = !isAutoTapping;
+        });
+        
+        // 创建敲击粒子效果
+        function createTapParticles() {
+            const particleCount = 15;
+            const木鱼Rect = woodenFish.getBoundingClientRect();
+            const centerX =木鱼Rect.left + 木鱼Rect.width / 2;
+            const centerY =木鱼Rect.top + 木鱼Rect.height / 2;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 6 + 2;
+                const angle = Math.random() * Math.PI * 2; // 随机角度
+                const distance = Math.random() * 30 + 10; // 随机距离
+                const x = centerX + Math.cos(angle) * distance;
+                const y = centerY + Math.sin(angle) * distance;
+                
+                // 粒子样式
+                particle.className = 'fixed rounded-full bg-amber-200 opacity-80 pointer-events-none';
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.transform = 'translate(-50%, -50%)';
+                particle.style.transition = `all 0.5s ease-out`;
+                
+                document.body.appendChild(particle);
+                
+                // 粒子动画
+                setTimeout(() => {
+                    particle.style.opacity = '0';
+                    particle.style.transform = `translate(-50%, -50%) scale(0.5) translateY(-10px)`;
+                    
+                    // 移除粒子
+                    setTimeout(() => {
+                        document.body.removeChild(particle);
+                    }, 500);
+                }, 10);
+            }
+        }
+        
+        // 移动端菜单切换
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const icon = menuBtn.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+        
+        // 页面加载时提示用户交互（解决音效自动播放限制）
+        window.addEventListener('load', () => {
+            // 首次点击页面任意位置激活音效
+            document.body.addEventListener('click', () => {
+                // 预加载音效
+                woodenSound.load();
+                // 只执行一次
+                document.body.removeEventListener('click', arguments.callee);
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
