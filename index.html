@@ -23,6 +23,30 @@
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
+                    keyframes: {
+                        // 语录渐入渐出动画
+                        fadeInOut: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '10%': { opacity: '1', transform: 'translateY(0)' },
+                            '90%': { opacity: '1', transform: 'translateY(0)' },
+                            '100%': { opacity: '0', transform: 'translateY(10px)' }
+                        },
+                        // 元素滚动触发动画
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        // 时钟数字跳动动画
+                        pulseSoft: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' }
+                        }
+                    },
+                    animation: {
+                        fadeInOut: 'fadeInOut 8s ease-in-out infinite',
+                        slideUp: 'slideUp 0.8s ease-out forwards',
+                        pulseSoft: 'pulseSoft 1s ease-in-out infinite'
+                    }
                 }
             }
         }
@@ -45,6 +69,12 @@
             }
             .bg-blur {
                 backdrop-filter: blur(8px);
+            }
+            .scroll-animate {
+                @apply opacity-0 translate-y-10 transition-all duration-700;
+            }
+            .scroll-animate.visible {
+                @apply opacity-100 translate-y-0;
             }
         }
     </style>
@@ -84,7 +114,7 @@
                 
                 <!-- 移动端菜单按钮 -->
                 <div class="md:hidden">
-                    <button id="menuBtn" class="text-white hover:text-primary focus:outline-none">
+                    <button id="menuBtn" class="text-white hover:text-primary focus:outline-none transition-all">
                         <i class="fa fa-bars text-2xl"></i>
                     </button>
                 </div>
@@ -92,7 +122,7 @@
         </div>
         
         <!-- 移动端菜单 -->
-        <div id="mobileMenu" class="md:hidden hidden bg-white/95 bg-blur mt-4 rounded-b-xl shadow-2xl mx-4 overflow-hidden">
+        <div id="mobileMenu" class="md:hidden hidden bg-white/95 bg-blur mt-4 rounded-b-xl shadow-2xl mx-4 overflow-hidden transition-all duration-300 ease-in-out">
             <div class="flex flex-col space-y-1">
                 <a href="#home" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">首页</a>
                 <a href="#features" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">功能</a>
@@ -107,7 +137,7 @@
 
     <!-- 主内容区 -->
     <main>
-        <!-- Hero区域 -->
+        <!-- Hero区域（新增时钟和随机语录） -->
         <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
             <!-- 背景图 -->
             <div class="absolute inset-0 z-0">
@@ -115,15 +145,37 @@
                 <div class="absolute inset-0 bg-dark/60"></div>
             </div>
             
-            <!-- 内容 -->
+            <!-- 实时时钟 -->
+            <div class="absolute top-24 left-1/2 transform -translate-x-1/2 z-10 text-center">
+                <div id="clock" class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-white text-shadow animate-pulseSoft">
+                    00:00:00
+                </div>
+                <div id="date" class="text-gray-200 mt-2 text-[clamp(0.8rem,2vw,1rem)]">
+                    2024年5月20日 星期一
+                </div>
+            </div>
+            
+            <!-- 渐入渐出随机语录 -->
+            <div class="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 max-w-2xl w-full px-4">
+                <div id="quoteContainer" class="bg-white/10 bg-blur rounded-xl p-6 shadow-lg">
+                    <p id="quote" class="text-white text-[clamp(1rem,3vw,1.25rem)] italic text-center">
+                        加载中...
+                    </p>
+                    <p id="quoteAuthor" class="text-white/80 text-right mt-3 text-sm">
+                        —— 未知作者
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 核心内容 -->
             <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-                <h1 class="text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white leading-tight mb-6 animate-fade-in">
+                <h1 class="text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white leading-tight mb-6 scroll-animate">
                     探索、创造、分享
                 </h1>
-                <p class="text-[clamp(1rem,3vw,1.25rem)] text-gray-100 mb-10 max-w-2xl mx-auto">
+                <p class="text-[clamp(1rem,3vw,1.25rem)] text-gray-100 mb-10 max-w-2xl mx-auto scroll-animate" style="transition-delay: 0.2s">
                     欢迎来到我的个人空间，这里有有趣的互动小工具、我的思考和分享，希望能给你带来一些乐趣和启发。
                 </p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <div class="flex flex-col sm:flex-row justify-center gap-4 scroll-animate" style="transition-delay: 0.4s">
                     <a href="wooden-fish.html" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center">
                         <i class="fa fa-gavel mr-2"></i> 敲击木鱼
                     </a>
@@ -132,7 +184,7 @@
                     </a>
                 </div>
                 
-                <!-- 滚动提示 -->
+                <!-- 滚动提示（添加上下浮动动画） -->
                 <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
                     <a href="#features" class="text-white/70 hover:text-white transition-colors">
                         <i class="fa fa-chevron-down text-2xl"></i>
@@ -141,10 +193,10 @@
             </div>
         </section>
         
-        <!-- 功能区 -->
+        <!-- 功能区（添加滚动触发动画） -->
         <section id="features" class="py-20 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
+                <div class="text-center mb-16 scroll-animate">
                     <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-4">有趣的小工具</h2>
                     <p class="text-gray-600 max-w-2xl mx-auto text-lg">
                         我制作了一些简单有趣的互动工具，希望能给你的生活带来一点乐趣
@@ -153,7 +205,7 @@
                 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 木鱼工具 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group scroll-animate">
                         <div class="h-48 overflow-hidden">
                             <img src="https://ts4.tc.mm.bing.net/th/id/OIP-C.5tLEIQkgfcQPUtVYz82y8QHaE7?rs=1&pid=ImgDetMain&o=7&rm=3" alt="电子木鱼" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                         </div>
@@ -172,7 +224,7 @@
                     </div>
                     
                     <!-- 猜数字游戏 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group scroll-animate" style="transition-delay: 0.1s">
                         <div class="h-48 overflow-hidden bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
                             <i class="fa fa-gamepad text-7xl text-accent/70"></i>
                         </div>
@@ -191,7 +243,7 @@
                     </div>
                     
                     <!-- 待办清单 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group scroll-animate" style="transition-delay: 0.2s">
                         <div class="h-48 overflow-hidden bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center">
                             <i class="fa fa-list-check text-7xl text-secondary/70"></i>
                         </div>
@@ -210,7 +262,7 @@
                     </div>
                     
                     <!-- 随机语录 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group scroll-animate" style="transition-delay: 0.3s">
                         <div class="h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                             <i class="fa fa-quote-right text-7xl text-primary/70"></i>
                         </div>
@@ -229,7 +281,7 @@
                     </div>
                     
                     <!-- 计算器 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group scroll-animate" style="transition-delay: 0.4s">
                         <div class="h-48 overflow-hidden bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center">
                             <i class="fa fa-calculator text-7xl text-accent/70"></i>
                         </div>
@@ -248,7 +300,7 @@
                     </div>
                     
                     <!-- 更多工具 -->
-                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-6">
+                    <div class="bg-light rounded-2xl overflow-hidden shadow-md card-hover group border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-6 scroll-animate" style="transition-delay: 0.5s">
                         <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                             <i class="fa fa-plus text-gray-400 text-2xl"></i>
                         </div>
@@ -264,10 +316,10 @@
             </div>
         </section>
         
-        <!-- 博客区域 -->
+        <!-- 博客区域（添加滚动触发动画） -->
         <section id="blog" class="py-20 bg-gray-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
+                <div class="text-center mb-16 scroll-animate">
                     <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-4">最新博客</h2>
                     <p class="text-gray-600 max-w-2xl mx-auto text-lg">
                         记录生活中的思考和感悟，分享我的学习心得和经验
@@ -276,7 +328,7 @@
                 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 博客文章1 -->
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover scroll-animate">
                         <div class="h-48 overflow-hidden">
                             <img src="https://picsum.photos/id/1/600/400" alt="编程学习" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                         </div>
@@ -299,7 +351,7 @@
                     </article>
                     
                     <!-- 博客文章2 -->
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover scroll-animate" style="transition-delay: 0.2s">
                         <div class="h-48 overflow-hidden">
                             <img src="https://picsum.photos/id/2/600/400" alt="生活感悟" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                         </div>
@@ -322,7 +374,7 @@
                     </article>
                     
                     <!-- 博客文章3 -->
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover">
+                    <article class="bg-white rounded-2xl overflow-hidden shadow-md card-hover scroll-animate" style="transition-delay: 0.4s">
                         <div class="h-48 overflow-hidden">
                             <img src="https://picsum.photos/id/3/600/400" alt="项目分享" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
                         </div>
@@ -345,7 +397,7 @@
                     </article>
                 </div>
                 
-                <div class="text-center mt-12">
+                <div class="text-center mt-12 scroll-animate" style="transition-delay: 0.6s">
                     <a href="#" class="inline-flex items-center px-6 py-3 bg-white text-primary border border-primary rounded-full shadow-sm hover:bg-primary/5 transition-all font-medium">
                         查看所有文章 <i class="fa fa-chevron-right ml-2"></i>
                     </a>
@@ -353,18 +405,18 @@
             </div>
         </section>
         
-        <!-- 关于我 -->
+        <!-- 关于我（添加滚动触发动画） -->
         <section id="about" class="py-20 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div>
+                    <div class="scroll-animate">
                         <div class="relative">
                             <div class="absolute -top-4 -left-4 w-64 h-64 bg-primary/10 rounded-full z-0"></div>
                             <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-accent/10 rounded-full z-0"></div>
                             <img src="https://www.jishuoshuo.com/wp-content/uploads/2025/08/054df7f2a49b5daff64701df0a89a009.jpg" alt="胡文皖" class="w-full max-w-sm mx-auto rounded-2xl shadow-xl relative z-10">
                         </div>
                     </div>
-                    <div>
+                    <div class="scroll-animate" style="transition-delay: 0.3s">
                         <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-gray-900 mb-6">关于我</h2>
                         <p class="text-gray-600 mb-4 text-lg">
                             你好，我是胡文皖，图片是本人，帅且不处。
@@ -404,15 +456,15 @@
             </div>
         </section>
         
-        <!-- 订阅区域 -->
+        <!-- 订阅区域（添加滚动触发动画） -->
         <section class="py-16 bg-primary/5">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center scroll-animate">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">订阅我的更新</h2>
                 <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
                     订阅我的邮件列表，获取最新的工具更新、博客文章和其他有趣的内容
                 </p>
                 <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-                    <input type="email" placeholder="输入你的邮箱地址" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <input type="email" placeholder="输入你的邮箱地址" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                     <button type="submit" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg">
                         订阅
                     </button>
@@ -511,7 +563,7 @@
         <i class="fa fa-chevron-up"></i>
     </button>
 
-    <!-- JavaScript -->
+    <!-- JavaScript（新增时钟和随机语录逻辑） -->
     <script>
         // 页面加载完成后隐藏加载动画
         window.addEventListener('load', () => {
@@ -522,11 +574,110 @@
                     loader.style.display = 'none';
                 }, 500);
             }, 600);
+            
+            // 初始化时钟和语录
+            initClock();
+            initRandomQuotes();
+            // 触发一次滚动检测，确保初始可见元素的动画生效
+            checkScrollAnimation();
         });
+        
+        // 1. 实时时钟功能
+        function initClock() {
+            const clockElement = document.getElementById('clock');
+            const dateElement = document.getElementById('date');
+            const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            
+            // 更新时间函数
+            function updateClock() {
+                const now = new Date();
+                // 格式化时间（补零）
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                // 格式化日期
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1; // 月份从0开始
+                const day = now.getDate();
+                const weekDay = weekDays[now.getDay()];
+                
+                // 更新DOM
+                clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+                dateElement.textContent = `${year}年${month}月${day}日 ${weekDay}`;
+            }
+            
+            // 初始更新 + 每秒更新
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+        
+        // 2. 随机语录（渐入渐出切换）
+        function initRandomQuotes() {
+            // 语录库（可自行扩展）
+            const quotes = [
+                { content: "生活就像海洋，只有意志坚强的人才能到达彼岸。", author: "马克思" },
+                { content: "成功的关键在于相信自己有能力成功。", author: "拿破仑·希尔" },
+                { content: "每一次努力都不会白费，每一次坚持都有意义。", author: "胡文皖" },
+                { content: "编程的本质是解决问题，而不是编写代码。", author: "未知开发者" },
+                { content: "昨天是历史，明天是谜团，而今天是礼物，这就是为什么它被称为“现在”。", author: "爱丽丝·莫尔斯·厄尔" },
+                { content: "不要等待机会，而要创造机会。", author: "萧伯纳" },
+                { content: "知识是宝藏，但实践是打开宝藏的钥匙。", author: "托马斯·富勒" },
+                { content: "最清晰的脚印，印在最泥泞的路上。", author: "未知" },
+                { content: "要么出众，要么出局，没有中间选项。", author: "李嘉诚" },
+                { content: "技术改变世界，但热情驱动技术。", author: "未知" }
+            ];
+            
+            const quoteElement = document.getElementById('quote');
+            const authorElement = document.getElementById('quoteAuthor');
+            const containerElement = document.getElementById('quoteContainer');
+            
+            // 随机获取一条语录
+            function getRandomQuote() {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                return quotes[randomIndex];
+            }
+            
+            // 切换语录（带渐入渐出动画）
+            function switchQuote() {
+                // 先淡出
+                containerElement.style.opacity = '0';
+                containerElement.style.transform = 'translateY(10px)';
+                
+                // 0.8秒后更新内容并淡入
+                setTimeout(() => {
+                    const randomQuote = getRandomQuote();
+                    quoteElement.textContent = randomQuote.content;
+                    authorElement.textContent = `—— ${randomQuote.author}`;
+                    
+                    containerElement.style.opacity = '1';
+                    containerElement.style.transform = 'translateY(0)';
+                }, 800);
+            }
+            
+            // 初始加载一条语录 + 每8秒切换一次
+            switchQuote();
+            setInterval(switchQuote, 8000);
+        }
+        
+        // 3. 滚动触发动画（元素进入视口时执行动画）
+        function checkScrollAnimation() {
+            const animateElements = document.querySelectorAll('.scroll-animate');
+            
+            animateElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                const isVisible = (elementTop < window.innerHeight * 0.8) && (elementBottom > 0);
+                
+                if (isVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
         
         // 导航栏滚动效果
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
+            // 导航栏样式切换
             if (window.scrollY > 100) {
                 navbar.classList.add('bg-dark/90', 'bg-blur', 'shadow-lg', 'py-2');
                 navbar.classList.remove('py-4');
@@ -544,6 +695,9 @@
                 backToTopBtn.classList.add('opacity-0', 'invisible');
                 backToTopBtn.classList.remove('opacity-100', 'visible');
             }
+            
+            // 检测滚动动画
+            checkScrollAnimation();
         });
         
         // 移动端菜单切换
@@ -597,8 +751,6 @@
     </script>
 </body>
 </html>
-    
-
 
 
 
