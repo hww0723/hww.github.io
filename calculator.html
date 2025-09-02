@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易计算器 - 胡文皖的小站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        dark: '#1e293b',
+                        calc: {
+                            bg: '#1e293b',
+                            display: '#2d3748',
+                            num: '#4a5568',
+                            op: '#3b82f6',
+                            func: '#ef4444'
+                        }
+                    },
+                    keyframes: {
+                        press: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(0.95)' },
+                            '100%': { transform: 'scale(1)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        }
+                    },
+                    animation: {
+                        press: 'press 0.2s ease-in-out',
+                        fadeIn: 'fadeIn 0.5s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .calc-shadow {
+                box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            }
+            .text-right-scroll {
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: thin;
+            }
+            .text-right-scroll::-webkit-scrollbar {
+                height: 4px;
+            }
+            .text-right-scroll::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 2px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 font-sans min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-white/80 bg-blur shadow-md py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                            <i class="fa fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl">胡文皖的小站</span>
+                    </a>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-primary transition-colors font-medium">主页</a>
+                    <a href="wooden-fish.html" class="text-gray-700 hover:text-primary transition-colors font-medium">木鱼</a>
+                    <a href="calculator.html" class="text-primary font-medium">计算器</a>
+                    <a href="tetris.html" class="text-gray-700 hover:text-primary transition-colors font-medium">俄罗斯方块</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-700 hover:text-primary focus:outline-none transition-all">
+                        <i class="fa fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white shadow-2xl mx-4 overflow-hidden transition-all duration-300 ease-in-out">
+            <div class="flex flex-col space-y-1">
+                <a href="index.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">主页</a>
+                <a href="wooden-fish.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">电子木鱼</a>
+                <a href="number-guess.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">猜数字</a>
+                <a href="todo-list.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">待办清单</a>
+                <a href="calculator.html" class="px-6 py-3 bg-primary/10 text-primary font-medium">计算器</a>
+                <a href="tetris.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">俄罗斯方块</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow pt-24 pb-20 flex items-center justify-center">
+        <section class="max-w-md w-full px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8 animate-fadeIn">
+                <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-gray-800 mb-2">简易计算器</h1>
+                <p class="text-gray-600">支持基本数学运算</p>
+            </div>
+            
+            <!-- 计算器主体 -->
+            <div class="bg-calc-bg rounded-2xl p-6 calc-shadow animate-fadeIn" style="animation-delay: 0.2s">
+                <!-- 显示区域 -->
+                <div class="bg-calc-display rounded-xl p-6 mb-6">
+                    <div id="calcHistory" class="text-gray-400 text-sm mb-2 text-right text-right-scroll">0</div>
+                    <div id="calcDisplay" class="text-white text-3xl font-bold text-right text-right-scroll">0</div>
+                </div>
+                
+                <!-- 按键区域（网格布局） -->
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- 功能键 -->
+                    <button class="calc-btn bg-calc-func text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-red-600 animate-press" data-key="C">
+                        C
+                    </button>
+                    <button class="calc-btn bg-calc-func text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-red-600 animate-press" data-key="DEL">
+                        <i class="fa fa-backspace"></i>
+                    </button>
+                    <button class="calc-btn bg-calc-func text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-red-600 animate-press" data-key="%">
+                        %
+                    </button>
+                    <button class="calc-btn bg-calc-op text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-blue-600 animate-press" data-key="/">
+                        ÷
+                    </button>
+                    
+                    <!-- 数字键 7-9 -->
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="7">
+                        7
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="8">
+                        8
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="9">
+                        9
+                    </button>
+                    <button class="calc-btn bg-calc-op text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-blue-600 animate-press" data-key="*">
+                        ×
+                    </button>
+                    
+                    <!-- 数字键 4-6 -->
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="4">
+                        4
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="5">
+                        5
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="6">
+                        6
+                    </button>
+                    <button class="calc-btn bg-calc-op text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-blue-600 animate-press" data-key="-">
+                        -
+                    </button>
+                    
+                    <!-- 数字键 1-3 -->
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="1">
+                        1
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="2">
+                        2
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key="3">
+                        3
+                    </button>
+                    <button class="calc-btn bg-calc-op text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-blue-600 animate-press" data-key="+">
+                        +
+                    </button>
+                    
+                    <!-- 数字键 0, ., = -->
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press col-span-2" data-key="0">
+                        0
+                    </button>
+                    <button class="calc-btn bg-calc-num text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-gray-500 animate-press" data-key=".">
+                        .
+                    </button>
+                    <button class="calc-btn bg-secondary text-white rounded-xl py-4 text-lg font-medium transition-all hover:bg-green-600 animate-press" data-key="=">
+                        =
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 使用说明 -->
+            <div class="mt-8 text-center text-gray-500 text-sm animate-fadeIn" style="animation-delay: 0.4s">
+                <p><i class="fa fa-info-circle mr-1 text-primary"></i> 点击按键或使用键盘输入</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-10 pb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="border-t border-gray-800 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                        &copy; 2025 胡文皖. 保留所有权利.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">隐私政策</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">使用条款</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 计算器状态变量
+        let currentValue = '0';
+        let previousValue = '';
+        let operator = '';
+        let shouldResetDisplay = false;
+        
+        // DOM元素
+        const calcDisplay = document.getElementById('calcDisplay');
+        const calcHistory = document.getElementById('calcHistory');
+        const calcButtons = document.querySelectorAll('.calc-btn');
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        // 更新显示
+        function updateDisplay() {
+            calcDisplay.textContent = currentValue;
+            if (previousValue && operator) {
+                calcHistory.textContent = `${previousValue} ${getOperatorSymbol(operator)}`;
+            } else {
+                calcHistory.textContent = '0';
+            }
+        }
+        
+        // 获取运算符符号（用于显示）
+        function getOperatorSymbol(op) {
+            switch(op) {
+                case '/': return '÷';
+                case '*': return '×';
+                case '-': return '-';
+                case '+': return '+';
+                default: return '';
+            }
+        }
+        
+        // 处理数字输入
+        function handleNumber(number) {
+            if (currentValue === '0' || shouldResetDisplay) {
+                currentValue = number;
+                shouldResetDisplay = false;
+            } else {
+                // 限制最大长度（避免显示溢出）
+                if (currentValue.length < 12) {
+                    currentValue += number;
+                }
+            }
+            updateDisplay();
+        }
+        
+        // 处理小数点
+        function handleDecimal() {
+            if (shouldResetDisplay) {
+                currentValue = '0.';
+                shouldResetDisplay = false;
+            } else if (!currentValue.includes('.')) {
+                currentValue += '.';
+            }
+            updateDisplay();
+        }
+        
+        // 处理运算符
+        function handleOperator(op) {
+            if (previousValue === '') {
+                previousValue = currentValue;
+            } else if (operator) {
+                // 计算之前的结果
+                const result = calculate();
+                previousValue = result;
+                currentValue = result;
+            }
+            operator = op;
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+        
+        // 计算结果
+        function calculate() {
+            const prev = parseFloat(previousValue);
+            const curr = parseFloat(currentValue);
+            let result = '';
+            
+            if (isNaN(prev) || isNaN(curr)) return '';
+            
+            switch(operator) {
+                case '+':
+                    result = (prev + curr).toString();
+                    break;
+                case '-':
+                    result = (prev - curr).toString();
+                    break;
+                case '*':
+                    result = (prev * curr).toString();
+                    break;
+                case '/':
+                    // 处理除零错误
+                    if (curr === 0) {
+                        alert('错误：不能除以零');
+                        resetCalculator();
+                        return '0';
+                    }
+                    result = (prev / curr).toString();
+                    break;
+                case '%':
+                    result = (prev % curr).toString();
+                    break;
+                default:
+                    return currentValue;
+            }
+            
+            // 处理小数末尾的零
+            if (result.includes('.')) {
+                result = result.replace(/\.?0*$/, '');
+            }
+            
+            // 限制结果长度
+            if (result.length > 12) {
+                result = parseFloat(result).toExponential(6);
+            }
+            
+            return result;
+        }
+        
+        // 重置计算器
+        function resetCalculator() {
+            currentValue = '0';
+            previousValue = '';
+            operator = '';
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+        
+        // 处理删除键
+        function handleDelete() {
+            if (currentValue.length === 1 || shouldResetDisplay) {
+                currentValue = '0';
+                shouldResetDisplay = false;
+            } else {
+                currentValue = currentValue.slice(0, -1);
+            }
+            updateDisplay();
+        }
+        
+        // 绑定按钮点击事件
+        calcButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 添加按键动画
+                button.classList.add('animate-press');
+                setTimeout(() => {
+                    button.classList.remove('animate-press');
+                }, 200);
+                
+                const key = button.getAttribute('data-key');
+                
+                // 根据按键类型处理
+                if (!isNaN(key) || key === '0') {
+                    handleNumber(key);
+                } else if (key === '.') {
+                    handleDecimal();
+                } else if (key === '+' || key === '-' || key === '*' || key === '/' || key === '%') {
+                    handleOperator(key);
+                } else if (key === '=') {
+                    if (operator === '') return;
+                    currentValue = calculate();
+                    previousValue = '';
+                    operator = '';
+                    shouldResetDisplay = true;
+                    updateDisplay();
+                } else if (key === 'C') {
+                    resetCalculator();
+                } else if (key === 'DEL') {
+                    handleDelete();
+                }
+            });
+        });
+        
+        // 绑定键盘事件
+        document.addEventListener('keydown', (e) => {
+            e.preventDefault(); // 阻止默认行为（如页面滚动）
+            
+            // 找到对应的按钮并触发点击
+            let key = e.key;
+            
+            // 处理数字键
+            if (!isNaN(key) || key === '0') {
+                const button = document.querySelector(`.calc-btn[data-key="${key}"]`);
+                if (button) button.click();
+            }
+            // 处理运算符
+            else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                const button = document.querySelector(`.calc-btn[data-key="${key}"]`);
+                if (button) button.click();
+            }
+            // 处理等号
+            else if (key === 'Enter' || key === '=') {
+                const button = document.querySelector(`.calc-btn[data-key="="]`);
+                if (button) button.click();
+            }
+            // 处理小数点
+            else if (key === '.') {
+                const button = document.querySelector(`.calc-btn[data-key="."]`);
+                if (button) button.click();
+            }
+            // 处理删除
+            else if (key === 'Backspace') {
+                const button = document.querySelector(`.calc-btn[data-key="DEL"]`);
+                if (button) button.click();
+            }
+            // 处理重置
+            else if (key === 'Escape') {
+                const button = document.querySelector(`.calc-btn[data-key="C"]`);
+                if (button) button.click();
+            }
+        });
+        
+        // 移动端菜单切换
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const icon = menuBtn.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+        
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html>
