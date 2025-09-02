@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现代数字时钟</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        digital: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            }
+            .clock-gradient {
+                background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            }
+            .digit-transition {
+                transition: all 0.3s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 font-digital">
+    <!-- 时钟容器 -->
+    <div class="clock-container relative">
+        <!-- 时钟主体 -->
+        <div class="clock-gradient rounded-2xl shadow-2xl p-6 md:p-10 w-full max-w-md">
+            <!-- 日期显示 -->
+            <div class="date text-gray-300 text-center mb-4 text-lg md:text-xl font-medium">
+                <span id="weekday" class="capitalize"></span>, <span id="date"></span>
+            </div>
+            
+            <!-- 时间显示 -->
+            <div class="time flex items-center justify-center gap-2 md:gap-4">
+                <div class="digit bg-dark rounded-lg p-3 md:p-5 shadow-inner w-16 h-24 md:w-24 md:h-36 flex items-center justify-center">
+                    <span id="hours" class="text-light text-4xl md:text-6xl font-bold text-shadow digit-transition"></span>
+                </div>
+                <div class="colon text-light text-4xl md:text-6xl font-bold flex items-center">
+                    <span id="colon">:</span>
+                </div>
+                <div class="digit bg-dark rounded-lg p-3 md:p-5 shadow-inner w-16 h-24 md:w-24 md:h-36 flex items-center justify-center">
+                    <span id="minutes" class="text-light text-4xl md:text-6xl font-bold text-shadow digit-transition"></span>
+                </div>
+                <div class="colon text-light text-4xl md:text-6xl font-bold flex items-center">
+                    <span id="colon2">:</span>
+                </div>
+                <div class="digit bg-dark rounded-lg p-3 md:p-5 shadow-inner w-16 h-24 md:w-24 md:h-36 flex items-center justify-center">
+                    <span id="seconds" class="text-light text-4xl md:text-6xl font-bold text-shadow digit-transition"></span>
+                </div>
+                <div class="period bg-primary/20 text-primary rounded-lg p-3 md:p-5 h-24 md:h-36 flex items-center justify-center ml-2">
+                    <span id="period" class="text-lg md:text-xl font-bold"></span>
+                </div>
+            </div>
+            
+            <!-- 时区信息 -->
+            <div class="timezone text-gray-400 text-center mt-4 text-sm">
+                <span id="timezone"></span>
+            </div>
+        </div>
+        
+        <!-- 装饰元素 -->
+        <div class="absolute -top-2 -left-2 w-10 h-10 bg-primary/30 rounded-full blur-md"></div>
+        <div class="absolute -bottom-3 -right-3 w-12 h-12 bg-secondary/30 rounded-full blur-md"></div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        const periodElement = document.getElementById('period');
+        const weekdayElement = document.getElementById('weekday');
+        const dateElement = document.getElementById('date');
+        const timezoneElement = document.getElementById('timezone');
+        const colonElement = document.getElementById('colon');
+        const colon2Element = document.getElementById('colon2');
+        
+        // 星期和月份的中文名称
+        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        
+        // 更新时钟函数
+        function updateClock() {
+            const now = new Date();
+            
+            // 获取时间组件
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            // 确定上午/下午
+            const period = hours >= 12 ? '下午' : '上午';
+            
+            // 转换为12小时制
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0应该显示为12
+            
+            // 格式化数字，确保两位数
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const formattedSeconds = seconds.toString().padStart(2, '0');
+            
+            // 更新DOM
+            hoursElement.textContent = formattedHours;
+            minutesElement.textContent = formattedMinutes;
+            secondsElement.textContent = formattedSeconds;
+            periodElement.textContent = period;
+            
+            // 更新日期
+            const weekday = weekdays[now.getDay()];
+            const month = months[now.getMonth()];
+            const date = now.getDate();
+            const year = now.getFullYear();
+            weekdayElement.textContent = weekday;
+            dateElement.textContent = `${month} ${date}日, ${year}年`;
+            
+            // 更新时区
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            timezoneElement.textContent = `时区: ${timezone}`;
+            
+            // 秒针跳动动画
+            secondsElement.classList.add('scale-110', 'text-primary');
+            setTimeout(() => {
+                secondsElement.classList.remove('scale-110', 'text-primary');
+            }, 300);
+            
+            // 冒号闪烁效果
+            if (seconds % 2 === 0) {
+                colonElement.style.opacity = '0.3';
+                colon2Element.style.opacity = '0.3';
+            } else {
+                colonElement.style.opacity = '1';
+                colon2Element.style.opacity = '1';
+            }
+        }
+        
+        // 初始化时钟
+        updateClock();
+        
+        // 每秒更新一次
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
