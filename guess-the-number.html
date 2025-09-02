@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猜数字游戏 - 胡文皖的小站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    },
+                    keyframes: {
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '70%': { transform: 'scale(1.1)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-5px)' },
+                            '75%': { transform: 'translateX(5px)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    },
+                    animation: {
+                        bounceIn: 'bounceIn 0.5s ease-out',
+                        shake: 'shake 0.3s ease-in-out',
+                        fadeIn: 'fadeIn 0.5s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .game-shadow {
+                box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+            }
+            .guess-bubble {
+                position: relative;
+                padding: 1rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            .guess-bubble::after {
+                content: '';
+                position: absolute;
+                bottom: -0.5rem;
+                left: 2rem;
+                border-width: 0.5rem 0.5rem 0;
+                border-style: solid;
+                border-color: inherit;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-pink-50 font-sans text-gray-800 antialiased">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-white/80 bg-blur shadow-md py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                            <i class="fa fa-cube text-white"></i>
+                        </div>
+                        <span class="font-bold text-xl">胡文皖的小站</span>
+                    </a>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-primary transition-colors font-medium">主页</a>
+                    <a href="wooden-fish.html" class="text-gray-700 hover:text-primary transition-colors font-medium">木鱼</a>
+                    <a href="calculator.html" class="text-gray-700 hover:text-primary transition-colors font-medium">计算器</a>
+                    <a href="tetris.html" class="text-gray-700 hover:text-primary transition-colors font-medium">俄罗斯方块</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-700 hover:text-primary focus:outline-none transition-all">
+                        <i class="fa fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white shadow-2xl mx-4 overflow-hidden transition-all duration-300 ease-in-out">
+            <div class="flex flex-col space-y-1">
+                <a href="index.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">主页</a>
+                <a href="wooden-fish.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">电子木鱼</a>
+                <a href="number-guess.html" class="px-6 py-3 bg-primary/10 text-primary font-medium">猜数字</a>
+                <a href="todo-list.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">待办清单</a>
+                <a href="calculator.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">计算器</a>
+                <a href="tetris.html" class="px-6 py-3 text-gray-800 hover:bg-primary/10 hover:text-primary transition-colors">俄罗斯方块</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="pt-24 pb-20">
+        <section class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10 animate-fadeIn">
+                <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-accent mb-4">猜数字游戏</h1>
+                <p class="text-gray-600 text-lg">系统已生成1-100之间的随机数，看看你能几次猜对！</p>
+            </div>
+            
+            <!-- 游戏面板 -->
+            <div class="bg-white rounded-2xl p-8 game-shadow animate-fadeIn" style="animation-delay: 0.2s">
+                <!-- 游戏状态 -->
+                <div class="flex flex-wrap justify-between items-center mb-8">
+                    <div class="bg-accent/10 rounded-lg px-4 py-2 mb-4 sm:mb-0">
+                        <span class="text-accent font-medium">已猜次数：</span>
+                        <span id="guessCount" class="text-xl font-bold">0</span>
+                    </div>
+                    <div class="bg-primary/10 rounded-lg px-4 py-
